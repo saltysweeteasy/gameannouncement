@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game Announcements</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 50px auto; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎮 Send Game Announcement</h2>
+        <input type="text" id="messageInput" placeholder="Type your message here...">
+        <button onclick="sendAnnouncement()">📢 Send to Roblox Game</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        async function sendAnnouncement() {
+            const message = document.getElementById('messageInput').value;
+            const status = document.getElementById('status');
+            
+            if (!message) {
+                status.innerHTML = "⚠️ Please enter a message!";
+                status.style.color = "red";
+                return;
+            }
+
+            status.innerHTML = "⏳ Sending...";
+            status.style.color = "blue";
+
+            try {
+                const response = await fetch('http://localhost:3000/send-announcement', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    status.innerHTML = "✅ Message sent to game!";
+                    status.style.color = "green";
+                    document.getElementById('messageInput').value = '';
+                } else {
+                    status.innerHTML = "❌ Failed to send message";
+                    status.style.color = "red";
+                }
+            } catch (error) {
+                status.innerHTML = "❌ Error: Make sure server is running!";
+                status.style.color = "red";
+                console.error('Error:', error);
+            }
+        }
+
+        // Press Enter to send message
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendAnnouncement();
+            }
+        });
+    </script>
+</body>
+</html>
